@@ -1,0 +1,13 @@
+.DS_Store
+.gsc.config
+
+# ./
+private/
+projects/
+documents/
+
+# ./labs
+CS100labs/
+
+# ./assignments
+CS100assignment
