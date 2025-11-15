@@ -8,7 +8,7 @@ void stats(int *data, int N, struct statistics *stats) {
 
     // minmax
     stats -> min = data[0];
-    stats -> max = data[1];
+    stats -> max = data[0];
 
     for (i = 0; i < N; i++) {
         if (stats -> min > data[i]) stats -> min = data[i];
