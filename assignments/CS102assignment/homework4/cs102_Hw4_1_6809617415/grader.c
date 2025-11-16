@@ -14,6 +14,7 @@ int main() {
 	
 	int i;
 	for (i = 0; i < N; i++) scanf("%d", &a[i]);
+	
 
 	get_n_terms(a, N, pos);
 	

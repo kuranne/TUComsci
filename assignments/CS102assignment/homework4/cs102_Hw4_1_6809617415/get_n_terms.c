@@ -21,7 +21,7 @@ void get_n_terms(const dll a[], int N, int pos[]){
     char pi[40];
     snprintf(pi, sizeof(pi), "%.35f", dPI);
     
-    printf("pi: %s\n", pi);
+    //printf("pi: %s\n", pi);
 
     for (i = 0; i < N; i++) {
         dll x = (i > 0)? (a[i] - (dll)UINT_MAX - 1LL): a[i];
@@ -29,11 +29,12 @@ void get_n_terms(const dll a[], int N, int pos[]){
         char cpi[40];
         snprintf(cpi, sizeof(cpi), "%.35f", dcpi);
         
-        printf("cpi: %s\n", cpi);
+        //printf("cpi: %s\n", cpi);
         
         for (j = 0; j < strlen(cpi); j++) {
             if (cpi[j] != pi[j]) {
                 pos[i] = (j == 0)? 0: (j <= 2)? 1: j -1;
+                pos[i] -= (pos[i] > 0)? 1: 0;
                 break;
             }
         }
