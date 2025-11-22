@@ -1,45 +1,37 @@
-#include "get_n_terms.h"
 #include <math.h>
-#include <limits.h>
 #include <stdio.h>
 #include <string.h>
-#define dll long long int
-#define s(x) 1.0/((x) * 2.0 + 1.0)
+#include "get_n_terms.h"
 
-double picalc(dll x) {
-    dll i;
-    double ans = 1;
-    for (i = 1; i <= x; i++) {
-        ans += (i % 2 == 0)? s(i): -s(i);
-    }
-    return ans * 4.0;
-}
+typedef unsigned long long int uint64;
 
-void get_n_terms(const dll a[], int N, int pos[]){
-    int i, j;
-    double dPI = M_PI;
-    char pi[40];
-    snprintf(pi, sizeof(pi), "%.35f", dPI);
+void get_n_terms(const long long int a[], int N, int pos[]) {
+    char pi[40], cps[40];
+    sprintf(pi, "%.35f", M_PI);
     
-    //printf("pi: %s\n", pi);
+    uint64 ua[N], j;
+    int i, count, k;
+    double ans;
 
+    for (i = 0; i < N; i++) ua[i] = (uint64)a[i];
+    
     for (i = 0; i < N; i++) {
-        dll x = (i > 0)? (a[i] - (dll)UINT_MAX - 1LL): a[i];
-        double dcpi = picalc(x);
-        char cpi[40];
-        snprintf(cpi, sizeof(cpi), "%.35f", dcpi);
-        
-        //printf("cpi: %s\n", cpi);
-        
-        for (j = 0; j < strlen(cpi); j++) {
-            if (cpi[j] != pi[j]) {
-                pos[i] = (j == 0)? 0: (j <= 2)? 1: j -1;
-                pos[i] -= (pos[i] > 0)? 1: 0;
-                break;
-            }
+        ans = 0;
+        count = 0;
+
+        #define s(x) 1.0/(2.0 * (x) + 1.0)
+        for (j = 0; j <= (int)ua[i]; j++) {
+            ans += s((double)j) * pow(-1.0, (double)j);
         }
+        #undef s
+
+        sprintf(cps, "%.35f", ans * 4);
+
+        for (k = 2; k < 40; k++) {
+            if (cps[k] == pi[k]) count++;
+            else break;
+        }
+
+        pos[i] = count;
     }
 }
-
-#undef dll
-#undef s
