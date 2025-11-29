@@ -1,12 +1,14 @@
 #include "stats.h"
 #include <stdlib.h>
 
+__attribute__((weak))
 void swap(int* arr, int i, int j) {
     int temp = arr[i];
     arr[i] = arr[j];
     arr[j] = temp;
 }
 
+__attribute__((weak))
 void bubbleSort(int arr[], int N) {
     int i, j;
 	for (i=0;i<N-1;i++) {

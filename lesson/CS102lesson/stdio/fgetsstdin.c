@@ -1,9 +1,3 @@
-#!/usr/bin/env zsh
-#if 0
-    /usr/bin/clang fgetsstdin.c -o fgetsstdin
-    ./fgetsstdin
-    exit
-#endif
 #include <stdio.h>
 #define BUFSIZE 100
 
