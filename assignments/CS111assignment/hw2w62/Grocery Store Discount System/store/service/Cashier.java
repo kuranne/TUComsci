@@ -1,8 +1,11 @@
+// Wirakorn Thanabat
+// 6809617415
+
 package store.service;
 
+import func.io.FastInput;
 import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
-import func.io.FastInput;
 import store.human.Customer;
 
 public class Cashier {

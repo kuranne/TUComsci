@@ -5,8 +5,9 @@ package company.humanResource;
 
 import company.employee.HourlyEmployee;
 import company.employee.PermanentEmployee;
-
 public class Printer {
+
+    // Format for Perm.
     public String slipFormat(PermanentEmployee permanentEmployee) {
         double socialSecurityRemittance = permanentEmployee.socialSecurityRemittance();
         double monthlyPayment = permanentEmployee.getMonthlyPayment();
@@ -42,8 +43,7 @@ public class Printer {
         );
     }
 
-        //
-
+    // Format for Hourly
     public String slipFormat(HourlyEmployee hourlyEmployee) {
         return String.format(
 """

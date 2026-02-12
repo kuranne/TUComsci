@@ -1,3 +1,6 @@
+// Wirakorn Thanabat
+// 6809617415
+
 package store.human;
 
 public class Customer {
