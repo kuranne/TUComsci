@@ -1,4 +1,3 @@
-# executeable
 *
 !*/
 !*.*
@@ -6,15 +5,9 @@
 .vscode/
 .DS_Store
 .gsc.config
-
-# ./
 private/
 projects/
 documents/
 practic/
-
-# ./labs
 CS100labs/
-
-# ./assignments
 CS100assignment
