@@ -22,22 +22,30 @@ Select one of
 
     // Setup
     public void setupGame() {
-        if (!MINIMAL_MODE) {
-            Printer.println(selectTxt, true);
-            selectSetting();
-            Printer.println(String.format(
-                "boardSize is %dx%d", 
-                boardSize.getRow(), 
-                boardSize.getCol()), 
-                false
-            );
-            Printer.println(String.format(
-                "Landmine amounts are set to %d", 
-                world.getAmountOfLandmines()), 
-                true
-            );
-        } else {
-            setBoardAndPlayer();
+        while (true) {
+            if (!MINIMAL_MODE) {
+                Printer.println(selectTxt, true);
+                selectSetting();
+                Printer.println(String.format(
+                    "boardSize is %dx%d", 
+                    boardSize.getRow(), 
+                    boardSize.getCol()), 
+                    false
+                );
+                Printer.println(String.format(
+                    "Landmine amounts are set to %d", 
+                    world.getAmountOfLandmines()), 
+                    true
+                );
+            } else {
+                setBoardAndPlayer();
+            }
+            BoardValid validate = isValidForBoardSetup();
+            if (!validate.getStatus()) {
+                Printer.println(Printer.bold(validate.getReason()), true);
+                continue;
+            }
+            break;
         }
         world.setupBoard();
     }
@@ -124,6 +132,12 @@ Select one of
     private boolean isValidCoordinate(Dimension choice) {
         return choice.getRow() >= 0 && choice.getRow() < boardSize.getRow()
                 && choice.getCol() >= 0 && choice.getCol() < boardSize.getCol();
+    }
+
+    private BoardValid isValidForBoardSetup() {
+        if (boardSize.getArea() < world.getAmountOfLandmines())
+            return new BoardValid(false, "Landmines can not has more than board grids");
+        return new BoardValid(true, "");
     }
 
     private boolean runCondition() {
