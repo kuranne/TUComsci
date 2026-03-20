@@ -1,24 +1,30 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one.space;
+package one;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import one.Resource;
 
-public class Map implements Resource {
+public class Board implements Resource {
     // Variable
-    private ArrayList<ArrayList<OBJECTS>> board;
-    private char[][] playerBoard;
-    private Dimension dimension;
+    private final ArrayList<ArrayList<OBJECTS>> board;
+    private final char[][] playerBoard;
+    private final Dimension dimension;
+    private final int amountOfLandmines;
+    private int openedLandmines;
 
     // Constructor
-    public Map(Dimension dimension, int amountOfLandmines) {
+    public Board(Dimension dimension, int amountOfLandmines) {
         this.dimension = dimension;
-        board = new ArrayList<>();
+        this.amountOfLandmines = amountOfLandmines;
+        this.openedLandmines = 0;
 
+        board = new ArrayList<>();
+        playerBoard = new char[dimension.getRow()][dimension.getCol()];
+    }
+    public void setupBoard() {
         // Make all in board is '-'
         for (int i = 0; i < dimension.getRow(); i++) {
             ArrayList<OBJECTS> newLineBoard = new ArrayList<>();
@@ -27,8 +33,6 @@ public class Map implements Resource {
             }
             board.add(newLineBoard);
         }
-        
-        playerBoard = new char[dimension.getRow()][dimension.getCol()];
 
         // Make all in playerBoard is 'X'(hidden)
         for (char[] row : playerBoard) {
@@ -39,7 +43,10 @@ public class Map implements Resource {
         
         while (usedLandmineDimension.size() < amountOfLandmines) {
             // Random a position of new landmine
-            Dimension nextRandom = new Dimension(rand.nextInt(dimension.getRow()), rand.nextInt(dimension.getCol()));
+            Dimension nextRandom = new Dimension(
+                rand.nextInt(dimension.getRow()), 
+                rand.nextInt(dimension.getCol())
+            );
             // Check isn't same as in used landmine position
             if (!usedLandmineDimension.contains(nextRandom)) {
                 // Get old row of board then change a char in that -> readd to the board
@@ -64,6 +71,7 @@ public class Map implements Resource {
         if (area == 'X') { // If area is hidden -> make it appeal
             OBJECTS what = board.get(row).get(col);
             playerBoard[row][col] = what.getChar();
+            if (what == OBJECTS.LANDMINE) openedLandmines++;
             return what.isSafe();
         } else {
             return true;
@@ -82,8 +90,19 @@ public class Map implements Resource {
         }
     }
 
+    public boolean isOutOfLandmine() {
+        return amountOfLandmines == openedLandmines;
+    }
+
     // Getter Methods
     public char[][] getPlayerBoard() {
         return playerBoard;
     }
+    public int getAmountOfLandmines() {
+        return amountOfLandmines;
+    }
+    public int getOpenedLandmines() {
+        return openedLandmines;
+    }
+    
 }

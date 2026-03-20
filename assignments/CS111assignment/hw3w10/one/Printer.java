@@ -1,11 +1,10 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one.core.printer;
+package one;
 
 import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
-import one.Resource;
 
 public class Printer implements Resource {
     private static final PrintWriter out = new PrintWriter(new BufferedOutputStream(System.out));
@@ -17,8 +16,8 @@ public class Printer implements Resource {
         if (flush) out.flush();
     }
 
-    public static void printMap(char[][] map) {
-        for (char[] row : map) {
+    public static void printBoard(char[][] Board) {
+        for (char[] row : Board) {
             for (char col : row) {
                 out.printf("%c ", col);
             }
@@ -34,13 +33,13 @@ public class Printer implements Resource {
         out.printf("Opening Grid %d , %d\n", dimension.getRow(), dimension.getCol());
     }
 
-    public static void showHealtPointOf(String type, int amount) {
+    public static void showHealthPointOf(String type, int amount) {
         out.printf("%s Life: %d\n", type, amount);
     }
 
-    public static void endGame(char[][] map) {
+    public static void endGame(char[][] Board) {
         out.println("\n------------- Game Ended. All Bombs' Location are -----------");
-        printMap(map); out.flush();
+        printBoard(Board); out.flush();
     }
 
     public static void flush() {

@@ -1,13 +1,15 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one.player;
+package one;
 
-import one.core.printer.Printer;
-
-public class RealPlayer extends PlayerData {
-    public RealPlayer(TYPE playerType) {
-        setPlayerType(playerType);
+public class PlayerHuman extends Player {
+    private final int id;
+    private static int total_id = 0;
+    public PlayerHuman() {
+        setPlayerType(TYPE.HUMAN);
+        id = total_id;
+        total_id++;
     }
 
     @Override
@@ -20,4 +22,11 @@ public class RealPlayer extends PlayerData {
         Dimension pos = new Dimension(row, col);
         return pos;
     }
+
+    // Getter Methods
+    @Override
+    public int getId() {
+        return id;
+    }
+
 }

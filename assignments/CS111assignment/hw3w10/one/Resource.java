@@ -7,18 +7,22 @@ import func.io.FastReader;
 import java.util.Random;
 
 public interface Resource {
+    // Special
+    public static final boolean MINIMAL_MODE = false; // For assignment sending if true
+
     // Constant
     public static final int MINIMUM_LANDMINE = 5;
     public static final int INITIAL_HEALT_POINT = 3;
-    public static final int REAL_PLAYER_AMOUNT = 1;
+    public static final int HUMAN_PLAYER_AMOUNT = 1;
     public static final int COMPUTER_PLAYER_AMOUNT = 1;
     public static final int BLAST_DAMAGE = 1;
+    public static final Dimension BOARD_SIZE = new Dimension(5, 5);
 
     public static final Random rand = new Random();
     public static final FastReader stdin = new FastReader(System.in);
 
     // Enums
-    // Object would use in Map
+    // Object would use in Board
     public enum OBJECTS {
         NONE('-'),
         LANDMINE('b');
@@ -37,7 +41,7 @@ public interface Resource {
     }
     // Type of player
     public enum TYPE {
-        PLAYER("Player"),
+        HUMAN("Human"),
         COMPUTER("Computer"),
         OTHER("Other");
         
@@ -59,6 +63,9 @@ public interface Resource {
         }
         public int getCol() {
             return col;
+        }
+        public int getArea() {
+            return row * col;
         }
     }
     
