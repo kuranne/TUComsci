@@ -1,41 +1,22 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package func.io;
+package one;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.StringTokenizer;
 
 public class FastReader {
     public final int BUF_SIZE = 1 << 16;
     private final DataInputStream din;
     private final byte[] buf;
     private int bufPointer, bytesRead;
-    private StringTokenizer stt;
 
     public FastReader(InputStream in) {
         din = new DataInputStream(in);
         buf = new byte[BUF_SIZE];
         bufPointer = bytesRead = 0;
-        stt = new StringTokenizer("");
-    }
-
-    public String nextLine() {
-        String ret = "";
-        byte c = read();
-        do {
-            ret += (char)c;
-        } while ((c = read()) != '\n' && c > -1);
-        return ret;
-    }
-
-    public String nextString() {
-        while (!stt.hasMoreTokens()) {
-            stt = new StringTokenizer(nextLine());
-        }
-        return stt.nextToken();
     }
 
     public int nextInt() {

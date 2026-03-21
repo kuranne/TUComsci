@@ -3,7 +3,7 @@
 
 package one;
 
-public class Main {
+public class TestGame {
     public static void main(String[] args) {
         Operator game = new Operator();
         game.run();

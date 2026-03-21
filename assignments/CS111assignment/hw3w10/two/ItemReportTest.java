@@ -3,13 +3,12 @@
 
 package two;
 
-import func.io.FastReader;
 import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
 
 public class ItemReportTest {
     private static final PrintWriter out = new PrintWriter(new BufferedOutputStream(System.out), true);
-    private static final FastReader in = new FastReader(System.in);
+    private static final FastInput in = new FastInput(System.in);
 
     public static void main(String[] args) {
         out.println("What is the name of this shopping list");
