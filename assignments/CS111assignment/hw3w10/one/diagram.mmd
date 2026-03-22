@@ -1,0 +1,109 @@
+classDiagram
+    class Resource {
+        <<interface>>
+        +MINIMAL_MODE: boolean
+        +INITIAL_HEALT_POINT: int
+        +BOARD_SIZE: Dimension
+        +rand: Random
+        +stdin: FastReader
+        +TYPE
+        +OBJECTS
+        +Dimension
+        +BoardValid
+    }
+
+    class TestGame {
+        +main(String[])
+    }
+
+    class Operator {
+        -players: ArrayList~Player~
+        -world: Board
+        -boardSize: Dimension
+        +run()
+        +setupGame()
+        +playersRound()
+        -processSinglePlayerTurn(Player)
+        +endGame()
+    }
+
+    class Player {
+        <<abstract>>
+        -HealthPoint: int
+        -alive: boolean
+        -playerType: TYPE
+        -deathCount: int
+        +getHealthPoint(): int
+        +isAlive(): boolean
+        +getPlayerType(): TYPE
+        +reduceHealthPointBy(int)
+        +choose(Dimension)*
+        +getId()*
+    }
+
+    class PlayerHuman {
+        -id: int
+        -total_id: int
+        +choose(Dimension) Dimension
+        +getId(): int
+    }
+
+    class PlayerComputer {
+        -openedGrid: HashSet~Dimension~
+        +choose(Dimension) Dimension
+        +getId(): int
+    }
+
+    class Board {
+        -board: ArrayList~ArrayList~OBJECTS~~
+        -playerBoard: char[][]
+        -dimension: Dimension
+        -amountOfLandmines: int
+        -openedLandmines: int
+        +setupBoard()
+        +choose(Dimension): boolean
+        +isReveal(Dimension): boolean
+        +revealAll()
+        +getPlayerBoard(): char[][]
+    }
+
+    class Printer {
+        -out: PrintWriter
+        +println(String, boolean)
+        +printBoard(char[][])
+        +turnOf(String)
+        +openingGrid(Dimension)
+        +showHealthPointOf(String, int)
+        +endGame(char[][])
+    }
+
+    class FastReader {
+        -din: DataInputStream
+        -buf: byte[]
+        -bufPointer: int
+        -bytesRead: int
+        +nextInt(): int
+    }
+
+    Resource <|.. Operator
+    Resource <|.. Player
+    Resource <|.. Board
+    Resource <|.. Printer
+
+    Player <|-- PlayerHuman
+    Player <|-- PlayerComputer
+
+    TestGame --> Operator : instantiates
+    Operator --> Player : manages ArrayList
+    Operator --> Board : owns
+    Operator --> Dimension : uses
+    Operator --> Printer : uses
+    Operator --> FastReader : uses via stdin
+
+    PlayerHuman --> FastReader : uses stdin
+    PlayerComputer --> Dimension : generates
+
+    Board --> Dimension : owns
+    Board --> OBJECTS : uses
+
+    Printer --> Dimension : uses

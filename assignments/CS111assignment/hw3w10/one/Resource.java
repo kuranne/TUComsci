@@ -7,7 +7,7 @@ import java.util.Random;
 
 public interface Resource {
     // Special
-    public static final boolean MINIMAL_MODE = false; // For assignment sending if true
+    public static final boolean MINIMAL_MODE = true; // For assignment sending if true
 
     // Constant
     public static final int MINIMUM_LANDMINE = 5;

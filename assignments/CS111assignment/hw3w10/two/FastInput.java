@@ -1,3 +1,6 @@
+// Wirakorn Thanabat
+// 6809617415
+
 package two;
 
 import java.io.BufferedReader;
