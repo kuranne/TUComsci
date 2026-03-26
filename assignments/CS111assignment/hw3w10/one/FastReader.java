@@ -8,13 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class FastReader {
-    public final int BUF_SIZE = 1 << 16;
-    private final DataInputStream din;
+    private final int BUF_SIZE = 1 << 16;
+    private final DataInputStream in;
     private final byte[] buf;
     private int bufPointer, bytesRead;
 
     public FastReader(InputStream in) {
-        din = new DataInputStream(in);
+        this.in = new DataInputStream(in);
         buf = new byte[BUF_SIZE];
         bufPointer = bytesRead = 0;
     }
@@ -40,7 +40,7 @@ public class FastReader {
 
     private void fillBuf() {
         try {
-            bytesRead = din.read(buf, bufPointer = 0, BUF_SIZE);
+            bytesRead = in.read(buf, bufPointer = 0, BUF_SIZE);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

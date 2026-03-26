@@ -6,8 +6,9 @@ package one;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import static one.Resource.*;
 
-public class Board implements Resource {
+public class Board {
     // Variable
     private final ArrayList<ArrayList<OBJECTS>> board;
     private final char[][] playerBoard;
@@ -22,40 +23,34 @@ public class Board implements Resource {
         this.openedLandmines = 0;
 
         board = new ArrayList<>();
-        playerBoard = new char[dimension.getRow()][dimension.getCol()];
+        playerBoard = new char[dimension.row()][dimension.col()];
     }
     public void setupBoard() {
-        // Make all in board is '-'
-        for (int i = 0; i < dimension.getRow(); i++) {
-            ArrayList<OBJECTS> newLineBoard = new ArrayList<>();
-            for (int j = 0; j < dimension.getCol(); j++) {
-                newLineBoard.add(OBJECTS.NONE);
+        // Initialize board with '-'
+        for (int i = 0; i < dimension.row(); i++) {
+            ArrayList<OBJECTS> row = new ArrayList<>();
+            for (int j = 0; j < dimension.col(); j++) {
+                row.add(OBJECTS.NONE);
             }
-            board.add(newLineBoard);
+            board.add(row);
         }
 
-        // Make all in playerBoard is 'X'(hidden)
+        // Initialize player board with 'X'
         for (char[] row : playerBoard) {
             Arrays.fill(row, 'X');
         }
         
-        HashSet<Dimension> usedLandmineDimension = new HashSet<>();
-        
-        while (usedLandmineDimension.size() < amountOfLandmines) {
-            // Random a position of new landmine
-            Dimension nextRandom = new Dimension(
-                rand.nextInt(dimension.getRow()), 
-                rand.nextInt(dimension.getCol())
+        // Place landmines randomly
+        HashSet<Dimension> placedLandmines = new HashSet<>();
+        while (placedLandmines.size() < amountOfLandmines) {
+            Dimension randomPos = new Dimension(
+                rand.nextInt(dimension.row()), 
+                rand.nextInt(dimension.col())
             );
-            // Check isn't same as in used landmine position
-            if (!usedLandmineDimension.contains(nextRandom)) {
-                // Get old row of board then change a char in that -> readd to the board
-                ArrayList<OBJECTS> subBoard = board.get(nextRandom.getRow());
-                subBoard.set(nextRandom.getCol(), OBJECTS.LANDMINE);
-                board.set(nextRandom.getRow(), subBoard);
-                
-                // Used landmine added
-                usedLandmineDimension.add(nextRandom);
+            
+            if (!placedLandmines.contains(randomPos)) {
+                board.get(randomPos.row()).set(randomPos.col(), OBJECTS.LANDMINE);
+                placedLandmines.add(randomPos);
             }
         }
     }
@@ -64,8 +59,8 @@ public class Board implements Resource {
     // A player choose a position -> if revealed as landmine -> B0OM!
     // Ret: true if not boom, else is BO0M!
     public boolean choose(Dimension dimension) throws ArrayIndexOutOfBoundsException {
-        int row = dimension.getRow();
-        int col = dimension.getCol();
+        int row = dimension.row();
+        int col = dimension.col();
         char area = playerBoard[row][col];
 
         if (area == 'X') { // If area is hidden -> make it appeal
@@ -83,8 +78,8 @@ public class Board implements Resource {
     }
 
     public void revealAll() {
-        for (int row = 0; row < dimension.getRow(); row++) {
-            for (int col = 0; col < dimension.getCol(); col++) {
+        for (int row = 0; row < dimension.row(); row++) {
+            for (int col = 0; col < dimension.col(); col++) {
                 playerBoard[row][col] = (board.get(row).get(col).isSafe()) ? '-' : 'b';
             }
         }

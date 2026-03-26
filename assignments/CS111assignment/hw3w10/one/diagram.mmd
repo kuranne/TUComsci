@@ -1,109 +1,137 @@
+%% Wirakorn Thanabat
+%% 6809617415
+
 classDiagram
     class Resource {
+        +MINIMAL_MODE : boolean$
+        +MINIMUM_LANDMINE : int$
+        +INITIAL_HEALT_POINT : int$
+        +HUMAN_PLAYER_AMOUNT : int$
+        +COMPUTER_PLAYER_AMOUNT : int$
+        +BLAST_DAMAGE : int $
+        +BOARD_SIZE : Dimension$
+        +rand : Random$
+        +stdin : FastReader$
+    }
+    class OBJECTS {
+        <<enumeration>>
+        NONE
+        LANDMINE
+        -description : String
+        +isSafe() boolean
+        +getChar() char
+    }
+    class TYPE {
+        <<enumeration>>
+        HUMAN
+        COMPUTER
+        OTHER
+        -description : String
+        +getType() String 
+    }
+    class Dimension {
+        <<record>>
+        +row : int
+        +col : int
+    }
+    class BoardValid {
+        <<record>>
+        +status : boolean
+        +reason : String
+    }
+    Resource ..> Dimension : nested
+    Resource ..> TYPE : nested
+    Resource ..> OBJECTS : nested
+    Resource ..> BoardValid : nested
+    Resource --> FastReader : instantiates
+    class FastReader {
+        -BUF_SIZE : int
+        -din : DataInputStream
+        -buf : byte[]
+        -bufPointer : int
+        -bytesRead : int 
+        FastReader(InputStream din)
+        +nextInt() int 
+        -read() byte
+        -fillBuf() void
+    }
+    class Printer {
+        -out : PrintWriter
+        -BOLD : String
+        -RESET : String
+        +println(String txt, boolean flush)$ void
+        +printBoard(char[][] board)$ void
+        +turnOf(String type)$ void
+        +openingGrid(Dimension dimension)$ void
+        +showHealthPointOf(String type, int amount)$ void
+        +endGame(char[][] board)$ void
+        +flush()$ void
+        +bold(String txt)$ String
+
+    }
+    class Selectable {
         <<interface>>
-        +MINIMAL_MODE: boolean
-        +INITIAL_HEALT_POINT: int
-        +BOARD_SIZE: Dimension
-        +rand: Random
-        +stdin: FastReader
-        +TYPE
-        +OBJECTS
-        +Dimension
-        +BoardValid
+        +choose() Dimension
     }
-
-    class TestGame {
-        +main(String[])
-    }
-
-    class Operator {
-        -players: ArrayList~Player~
-        -world: Board
-        -boardSize: Dimension
-        +run()
-        +setupGame()
-        +playersRound()
-        -processSinglePlayerTurn(Player)
-        +endGame()
-    }
-
     class Player {
         <<abstract>>
-        -HealthPoint: int
-        -alive: boolean
-        -playerType: TYPE
-        -deathCount: int
-        +getHealthPoint(): int
-        +isAlive(): boolean
-        +getPlayerType(): TYPE
-        +reduceHealthPointBy(int)
-        +choose(Dimension)*
-        +getId()*
+        -healthPoint : int
+        -alive : boolean
+        -playerType : TYPE
+        -deathCount : int$
+        Player(TYPE playerType)
+        +isAlive() boolean
+        +getId()* int
+        +reduceHealthPointBy(int damage) void
+        +choose(Dimension range)* Dimension
     }
-
+    Player ..> Resource : static import
+    Player ..|> Selectable : implements
     class PlayerHuman {
-        -id: int
-        -total_id: int
-        +choose(Dimension) Dimension
-        +getId(): int
+        -id : int
+        -totalId : int$
+        +choose(Dimension range) Dimension
     }
-
+    PlayerHuman --|> Player : extends
+    PlayerHuman ..> Printer : uses
     class PlayerComputer {
-        -openedGrid: HashSet~Dimension~
-        +choose(Dimension) Dimension
-        +getId(): int
+        -openedPositions : HashSet<Dimension>$
+        +choose(Dimension range) Dimension
     }
-
+    PlayerComputer --|> Player : extends
     class Board {
-        -board: ArrayList~ArrayList~OBJECTS~~
-        -playerBoard: char[][]
-        -dimension: Dimension
-        -amountOfLandmines: int
-        -openedLandmines: int
-        +setupBoard()
-        +choose(Dimension): boolean
-        +isReveal(Dimension): boolean
-        +revealAll()
-        +getPlayerBoard(): char[][]
+        -board : List~List~OBJECTS~~
+        -playerBoard : char[][]
+        -dimension : Dimension
+        -amountOfLandmines : int
+        -openedLandmines : int
+        Board(Dimension dimension, int amountOfLandmines)
+        +setupBoard() void
+        +choose(Dimension dimension) boolean$ ArrayIndexOutOfBoundsException
+        +isReveal(Dimension dimension) boolean
+        +isOutOfLandmines() boolean
+        +revealAll() void
+
+    }
+    Board ..> Resource : static import
+    class Operator {
+        -ArrayList~Player~ players
+        -Board world
+        -Dimension boardSize
+        +Operator()
+        +setupGame() void
+        +run() void
+        -playersRound() void
+        -processSinglePlayerTurn(Player p) void
+        +endGame() void
     }
 
-    class Printer {
-        -out: PrintWriter
-        +println(String, boolean)
-        +printBoard(char[][])
-        +turnOf(String)
-        +openingGrid(Dimension)
-        +showHealthPointOf(String, int)
-        +endGame(char[][])
+    Operator --o Player : manages
+    Operator --* Board : owns
+    Operator ..> Resource : static import
+    Operator ..> Printer : uses
+    Operator ..> BoardValid : uses
+    class TestGame {
+        +main(String[] args)$ void
     }
-
-    class FastReader {
-        -din: DataInputStream
-        -buf: byte[]
-        -bufPointer: int
-        -bytesRead: int
-        +nextInt(): int
-    }
-
-    Resource <|.. Operator
-    Resource <|.. Player
-    Resource <|.. Board
-    Resource <|.. Printer
-
-    Player <|-- PlayerHuman
-    Player <|-- PlayerComputer
-
     TestGame --> Operator : instantiates
-    Operator --> Player : manages ArrayList
-    Operator --> Board : owns
-    Operator --> Dimension : uses
-    Operator --> Printer : uses
-    Operator --> FastReader : uses via stdin
-
-    PlayerHuman --> FastReader : uses stdin
-    PlayerComputer --> Dimension : generates
-
-    Board --> Dimension : owns
-    Board --> OBJECTS : uses
-
-    Printer --> Dimension : uses

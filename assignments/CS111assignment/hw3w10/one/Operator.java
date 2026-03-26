@@ -3,11 +3,11 @@
 package one;
 
 import java.util.ArrayList;
+import static one.Resource.*;
 
-public class Operator implements Resource {
-
+public class Operator {
     // Variables
-    private final String selectTxt = """
+    private static final String SELECT_TEXT = """
 Select one of
 1. Start the game with default setting
 2. Set players and Board size before start""";
@@ -24,12 +24,12 @@ Select one of
     public void setupGame() {
         while (true) {
             if (!MINIMAL_MODE) {
-                Printer.println(selectTxt, true);
+                Printer.println(SELECT_TEXT, true);
                 selectSetting();
                 Printer.println(String.format(
                     "boardSize is %dx%d", 
-                    boardSize.getRow(), 
-                    boardSize.getCol()), 
+                    boardSize.row(), 
+                    boardSize.col()), 
                     false
                 );
                 Printer.println(String.format(
@@ -41,8 +41,8 @@ Select one of
                 setBoardAndPlayer();
             }
             BoardValid validate = isValidForBoardSetup();
-            if (!validate.getStatus()) {
-                Printer.println(Printer.bold(validate.getReason()), true);
+            if (!validate.status()) {
+                Printer.println(Printer.bold(validate.reason()), true);
                 continue;
             }
             break;
@@ -61,12 +61,12 @@ Select one of
     }
 
     private void playersRound() {
-        // For each player
-        for (Player nowPlayer : players) {
-            if (!nowPlayer.isAlive()) {
-                continue; // That is alive
+        // Process turn for each alive player
+        for (Player player : players) {
+            if (!player.isAlive()) {
+                continue;
             }
-            processSinglePlayerTurn(nowPlayer); // Give their turn
+            processSinglePlayerTurn(player);
 
             if (!runCondition()) {
                 break;
@@ -78,12 +78,8 @@ Select one of
         boolean validMove = false;
 
         while (!validMove) {
-            Printer.turnOf((MINIMAL_MODE || player.getId() == -1)
-                    ? player.getPlayerTypeString()
-                    : String.format(
-                        "Human ID: %d", 
-                        player.getId())
-            );
+            String turnLabel = getTurnLabel(player);
+            Printer.turnOf(turnLabel);
 
             Dimension playerChoice = player.choose(boardSize);
 
@@ -94,14 +90,14 @@ Select one of
                 continue;
             }
 
-            // Chick a grid if close -> said no
+            // Check if grid is already opened
             if (world.isReveal(playerChoice)) {
                 Printer.println(
                     Printer.bold(
                         String.format(
                             "Grid %d,%d is already opened. Choose again", 
-                            playerChoice.getRow(), 
-                            playerChoice.getCol()
+                            playerChoice.row(), 
+                            playerChoice.col()
                         )
                     ), 
                 true
@@ -114,7 +110,7 @@ Select one of
                 player.reduceHealthPointBy(1);
             }
 
-            Printer.openingGrid(playerChoice);
+            Printer.openingGrid(playerChoice.row(), playerChoice.col());
             Printer.printBoard(world.getPlayerBoard());
 
             for (Player p : players) {
@@ -130,12 +126,12 @@ Select one of
 
     // Validate
     private boolean isValidCoordinate(Dimension choice) {
-        return choice.getRow() >= 0 && choice.getRow() < boardSize.getRow()
-                && choice.getCol() >= 0 && choice.getCol() < boardSize.getCol();
+        return choice.row() >= 0 && choice.row() < boardSize.row()
+                && choice.col() >= 0 && choice.col() < boardSize.col();
     }
 
     private BoardValid isValidForBoardSetup() {
-        if (boardSize.getArea() < world.getAmountOfLandmines())
+        if (boardSize.area() < world.getAmountOfLandmines())
             return new BoardValid(false, "Landmines can not has more than board grids");
         return new BoardValid(true, "");
     }
@@ -147,6 +143,18 @@ Select one of
 
     private int allowanceLandmines(int landmines) {
         return Math.max(landmines, MINIMUM_LANDMINE);
+    }
+
+    private String getTurnLabel(Player player) {
+        boolean isComputer = player.getPlayerType() == TYPE.COMPUTER;
+        boolean isOnlyOneHuman = countHumanPlayers() == 1;
+        return (isComputer || isOnlyOneHuman) 
+            ? player.getPlayerTypeString()
+            : String.format("Human ID: %d", player.getId());
+    }
+
+    private long countHumanPlayers() {
+        return players.stream().filter(p -> p.getPlayerType() == TYPE.HUMAN).count();
     }
 
     private void selectSetting() {
@@ -179,7 +187,7 @@ Select one of
 
     private void setDefaultBoard() {
         boardSize = BOARD_SIZE;
-        world = new Board(boardSize, boardSize.getArea() / 5);
+        world = new Board(boardSize, boardSize.area() / 5);
     }
 
     private void defaultSetting() {

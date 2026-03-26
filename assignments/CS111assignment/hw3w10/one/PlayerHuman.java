@@ -3,24 +3,23 @@
 
 package one;
 
+import static one.Resource.*;
+
 public class PlayerHuman extends Player {
     private final int id;
-    private static int total_id = 0;
+    private static int totalId = 0;
     public PlayerHuman() {
         setPlayerType(TYPE.HUMAN);
-        id = total_id;
-        total_id++;
+        id = totalId;
+        totalId++;
     }
 
-    @Override
     public Dimension choose(Dimension range) {
-        int row, col;
         Printer.println("Input row", true);
-        row = stdin.nextInt();
+        int row = stdin.nextInt();
         Printer.println("Input col", true);
-        col = stdin.nextInt();
-        Dimension pos = new Dimension(row, col);
-        return pos;
+        int col = stdin.nextInt();
+        return new Dimension(row, col);
     }
 
     // Getter Methods

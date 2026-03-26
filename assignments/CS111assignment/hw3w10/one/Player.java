@@ -3,17 +3,19 @@
 
 package one;
 
-public abstract class Player implements Resource {
-    // Vairiable
-    private int HealthPoint;
+import static one.Resource.*;
+
+public abstract class Player implements Selectable {
+    // Variable
+    private int healthPoint;
     private boolean alive;
     private TYPE playerType;
     private static int deathCount = 0;
 
-    // Contructor;
+    // Constructor
     public Player() {
-        HealthPoint = INITIAL_HEALT_POINT;
-        alive = HealthPoint > 0;
+        healthPoint = INITIAL_HEALT_POINT;
+        alive = healthPoint > 0;
     }
     public Player(TYPE playerType) {
         this();
@@ -22,7 +24,7 @@ public abstract class Player implements Resource {
 
     // Getter Methods
     public int getHealthPoint() {
-        return HealthPoint;
+        return healthPoint;
     }
     public boolean isAlive() {
         return alive;
@@ -39,19 +41,18 @@ public abstract class Player implements Resource {
     public abstract int getId();
 
     // Setter & Changer Methods
-    public void reduceHealthPointBy(int HealthPoint) {
+    public void reduceHealthPointBy(int damage) {
         if (alive) {
-            this.HealthPoint -= HealthPoint;
+            healthPoint -= damage;
+            if (healthPoint < 0) {
+                healthPoint = 0;
+            }
             updateAlive();
-        }
-
-        if (HealthPoint < 0) {
-            this.HealthPoint = 0;
         }
     }
     
     public void updateAlive() {
-        alive = HealthPoint > 0;
+        alive = healthPoint > 0;
         if (!alive) deathCount++;
     }
 
@@ -59,8 +60,8 @@ public abstract class Player implements Resource {
         this.playerType = playerType;
     }
 
-    public void setHealthPoint(int HealthPoint) {
-        this.HealthPoint = HealthPoint;
+    public void setHealthPoint(int healthPoint) {
+        this.healthPoint = healthPoint;
     }
     
     // Other Methods

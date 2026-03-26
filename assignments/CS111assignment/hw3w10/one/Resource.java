@@ -5,9 +5,11 @@ package one;
 
 import java.util.Random;
 
-public interface Resource {
+public class Resource {
+    // Block
+    private Resource() {}
     // Special
-    public static final boolean MINIMAL_MODE = true; // For assignment sending if true
+    public static final boolean MINIMAL_MODE = false; // For assignment sending if true
 
     // Constant
     public static final int MINIMUM_LANDMINE = 5;
@@ -22,11 +24,11 @@ public interface Resource {
 
     // Enums
     // Object would use in Board
-    public enum OBJECTS {
+    public static enum OBJECTS {
         NONE('-'),
         LANDMINE('b');
 
-        char description;
+        private final char description;
 
         private OBJECTS(char description) {
             this.description = description;
@@ -39,7 +41,7 @@ public interface Resource {
         }
     }
     // Type of player
-    public enum TYPE {
+    public static enum TYPE {
         HUMAN("Human"),
         COMPUTER("Computer"),
         OTHER("Other");
@@ -56,24 +58,10 @@ public interface Resource {
     }
 
     // Record
-    public record Dimension(int row, int col) {
-        public int getRow() {
-            return row;
-        }
-        public int getCol() {
-            return col;
-        }
-        public int getArea() {
+    public static record Dimension(int row, int col) {
+        public int area() {
             return row * col;
         }
     }
-    public record BoardValid(boolean status, String reason) {
-        public boolean getStatus() {
-            return status;
-        }
-        public String getReason() {
-            return reason;
-        }
-    }
-    
+    public static record BoardValid(boolean status, String reason) {}
 }

@@ -6,7 +6,7 @@ package one;
 import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
 
-public class Printer implements Resource {
+public class Printer {
     private static final PrintWriter out = new PrintWriter(new BufferedOutputStream(System.out));
     private static final String BOLD = "\u001B[1m";
     private static final String RESET = "\u001B[0m";
@@ -16,8 +16,8 @@ public class Printer implements Resource {
         if (flush) out.flush();
     }
 
-    public static void printBoard(char[][] Board) {
-        for (char[] row : Board) {
+    public static void printBoard(char[][] board) {
+        for (char[] row : board) {
             for (char col : row) {
                 out.printf("%c ", col);
             }
@@ -29,17 +29,17 @@ public class Printer implements Resource {
         out.printf("------- %s Turn -------\n", type);
     }
 
-    public static void openingGrid(Dimension dimension) {
-        out.printf("Opening Grid %d , %d\n", dimension.getRow(), dimension.getCol());
+    public static void openingGrid(int row, int col) {
+        out.printf("Opening Grid %d , %d\n", row, col);
     }
 
     public static void showHealthPointOf(String type, int amount) {
         out.printf("%s Life: %d\n", type, amount);
     }
 
-    public static void endGame(char[][] Board) {
+    public static void endGame(char[][] board) {
         out.println("\n------------- Game Ended. All Bombs' Location are -----------");
-        printBoard(Board); out.flush();
+        printBoard(board); out.flush();
     }
 
     public static void flush() {
