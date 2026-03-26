@@ -12,6 +12,7 @@ classDiagram
         +BOARD_SIZE : Dimension$
         +rand : Random$
         +stdin : FastReader$
+        +stdout : Printer$
     }
     class OBJECTS {
         <<enumeration>>
@@ -34,16 +35,12 @@ classDiagram
         +row : int
         +col : int
     }
-    class BoardValid {
-        <<record>>
-        +status : boolean
-        +reason : String
-    }
     Resource ..> Dimension : nested
     Resource ..> TYPE : nested
     Resource ..> OBJECTS : nested
-    Resource ..> BoardValid : nested
     Resource --> FastReader : instantiates
+    Resource --> Printer : instantiates
+
     class FastReader {
         -BUF_SIZE : int
         -din : DataInputStream
@@ -59,15 +56,15 @@ classDiagram
         -out : PrintWriter
         -BOLD : String
         -RESET : String
-        +println(String txt, boolean flush)$ void
-        +printBoard(char[][] board)$ void
-        +turnOf(String type)$ void
-        +openingGrid(Dimension dimension)$ void
-        +showHealthPointOf(String type, int amount)$ void
-        +endGame(char[][] board)$ void
-        +flush()$ void
-        +bold(String txt)$ String
-
+        Printer(OutputStream out)
+        +println(String txt, boolean flush) void
+        +printBoard(char[][] board) void
+        +turnOf(String type) void
+        +openingGrid(Dimension dimension) void
+        +showHealthPointOf(String type, int amount) void
+        +endGame(char[][] board) void
+        +flush() void
+        +bold(String txt) String
     }
     class Selectable {
         <<interface>>
@@ -93,7 +90,6 @@ classDiagram
         +choose(Dimension range) Dimension
     }
     PlayerHuman --|> Player : extends
-    PlayerHuman ..> Printer : uses
     class PlayerComputer {
         -openedPositions : HashSet<Dimension>$
         +choose(Dimension range) Dimension
@@ -114,6 +110,14 @@ classDiagram
 
     }
     Board ..> Resource : static import
+    class RuntimeException {
+        <<Built-in>>
+    }
+    class InvalidBoardInitializeException {
+        <<exception>>
+        +InvalidBoardInitializeException(String message)
+    }
+    InvalidBoardInitializeException --|> RuntimeException
     class Operator {
         -ArrayList~Player~ players
         -Board world
@@ -125,12 +129,11 @@ classDiagram
         -processSinglePlayerTurn(Player p) void
         +endGame() void
     }
-
     Operator --o Player : manages
     Operator --* Board : owns
     Operator ..> Resource : static import
-    Operator ..> Printer : uses
-    Operator ..> BoardValid : uses
+    Operator ..> InvalidBoardInitializeException : throws
+
     class TestGame {
         +main(String[] args)$ void
     }

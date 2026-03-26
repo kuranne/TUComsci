@@ -21,7 +21,7 @@ public class Resource {
 
     public static final Random rand = new Random();
     public static final FastReader stdin = new FastReader(System.in);
-
+    public static final Printer stdout = new Printer(System.out);
     // Enums
     // Object would use in Board
     public static enum OBJECTS {
@@ -63,5 +63,4 @@ public class Resource {
             return row * col;
         }
     }
-    public static record BoardValid(boolean status, String reason) {}
 }

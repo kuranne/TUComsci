@@ -3,6 +3,10 @@
 package one;
 
 import java.util.ArrayList;
+
+import one.Resource.Dimension;
+import one.Resource.TYPE;
+
 import static one.Resource.*;
 
 public class Operator {
@@ -24,15 +28,15 @@ Select one of
     public void setupGame() {
         while (true) {
             if (!MINIMAL_MODE) {
-                Printer.println(SELECT_TEXT, true);
+                stdout.println(SELECT_TEXT, true);
                 selectSetting();
-                Printer.println(String.format(
+                stdout.println(String.format(
                     "boardSize is %dx%d", 
                     boardSize.row(), 
                     boardSize.col()), 
                     false
                 );
-                Printer.println(String.format(
+                stdout.println(String.format(
                     "Landmine amounts are set to %d", 
                     world.getAmountOfLandmines()), 
                     true
@@ -40,12 +44,12 @@ Select one of
             } else {
                 setBoardAndPlayer();
             }
-            BoardValid validate = isValidForBoardSetup();
-            if (!validate.status()) {
-                Printer.println(Printer.bold(validate.reason()), true);
-                continue;
+            try {
+                if (isValidBoardCreated())
+                    break;
+            } catch (InvalidBoardInitializeException e) {
+                stdout.println(e.toString(), true);
             }
-            break;
         }
         world.setupBoard();
     }
@@ -79,21 +83,21 @@ Select one of
 
         while (!validMove) {
             String turnLabel = getTurnLabel(player);
-            Printer.turnOf(turnLabel);
+            stdout.turnOf(turnLabel);
 
             Dimension playerChoice = player.choose(boardSize);
 
             if (!isValidCoordinate(playerChoice)) {
-                Printer.println(
-                    Printer.bold("Invalid row or column. Choose again"), 
+                stdout.println(
+                    stdout.bold("Invalid row or column. Choose again"), 
                     true);
                 continue;
             }
 
             // Check if grid is already opened
             if (world.isReveal(playerChoice)) {
-                Printer.println(
-                    Printer.bold(
+                stdout.println(
+                    stdout.bold(
                         String.format(
                             "Grid %d,%d is already opened. Choose again", 
                             playerChoice.row(), 
@@ -110,18 +114,18 @@ Select one of
                 player.reduceHealthPointBy(1);
             }
 
-            Printer.openingGrid(playerChoice.row(), playerChoice.col());
-            Printer.printBoard(world.getPlayerBoard());
+            stdout.openingGrid(playerChoice.row(), playerChoice.col());
+            stdout.printBoard(world.getPlayerBoard());
 
             for (Player p : players) {
-                Printer.showHealthPointOf(p.getPlayerTypeString(), p.getHealthPoint());
+                stdout.showHealthPointOf(p.getPlayerTypeString(), p.getHealthPoint());
             }
         }
     }
 
     public void endGame() {
         world.revealAll();
-        Printer.endGame(world.getPlayerBoard());
+        stdout.endGame(world.getPlayerBoard());
     }
 
     // Validate
@@ -129,11 +133,11 @@ Select one of
         return choice.row() >= 0 && choice.row() < boardSize.row()
                 && choice.col() >= 0 && choice.col() < boardSize.col();
     }
-
-    private BoardValid isValidForBoardSetup() {
-        if (boardSize.area() < world.getAmountOfLandmines())
-            return new BoardValid(false, "Landmines can not has more than board grids");
-        return new BoardValid(true, "");
+    private boolean isValidBoardCreated() throws InvalidBoardInitializeException {
+        if (boardSize.area() < world.getAmountOfLandmines()) {
+            throw new InvalidBoardInitializeException("Board's grids area must be more than landmines");
+        }
+        return true;
     }
 
     private boolean runCondition() {
@@ -166,7 +170,7 @@ Select one of
                 customSetting();
             }
             default -> {
-                Printer.println(Printer.bold("Please Select one of them"), true);
+                stdout.println(stdout.bold("Please Select one of them"), true);
                 selectSetting();
             }
         }
@@ -198,17 +202,17 @@ Select one of
     // Custom setting
     private void setCustomPlayer() {
         try {
-            Printer.println("Input for Number of Human Players", true);
+            stdout.println("Input for Number of Human Players", true);
             setPlayer(TYPE.HUMAN, stdin.nextInt());
-            Printer.println("Input for Number of Computer Players", true);
+            stdout.println("Input for Number of Computer Players", true);
             setPlayer(TYPE.COMPUTER, stdin.nextInt());
-            Printer.println("Input for Health of Players", true);
+            stdout.println("Input for Health of Players", true);
             int Health = stdin.nextInt();
             for (Player player : players) {
                 player.setHealthPoint(Health);
             }
         } catch (NumberFormatException e) {
-            Printer.println("Failed to parse int, use default setting instread", true);
+            stdout.println("Failed to parse int, use default setting instread", true);
             setDefaultPlayer();
         }
     }
@@ -226,15 +230,15 @@ Select one of
 
     // Getter Methods
     private Dimension getCustomboardSize() {
-        Printer.println("Input for row of Board", true);
+        stdout.println("Input for row of Board", true);
         int row = stdin.nextInt();
-        Printer.println("Input for colum of Board", true);
+        stdout.println("Input for colum of Board", true);
         int col = stdin.nextInt();
         return boardSize = new Dimension(row, col);
     }
 
     private int getCustomLandmineAmount() {
-        Printer.println(
+        stdout.println(
             String.format(
                 "Input for landmine amounts %s", 
                 (MINIMAL_MODE) ? "(not less than 5)" : ""
