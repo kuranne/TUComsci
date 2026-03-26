@@ -15,9 +15,9 @@ public class PlayerHuman extends Player {
     }
 
     public Dimension choose(Dimension range) {
-        Printer.println("Input row", true);
+        stdout.println("Input row", true);
         int row = stdin.nextInt();
-        Printer.println("Input col", true);
+        stdout.println("Input col", true);
         int col = stdin.nextInt();
         return new Dimension(row, col);
     }
