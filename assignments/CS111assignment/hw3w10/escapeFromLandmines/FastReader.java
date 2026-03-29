@@ -1,7 +1,7 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one;
+package escapeFromLandmines;
 
 import java.io.DataInputStream;
 import java.io.IOException;

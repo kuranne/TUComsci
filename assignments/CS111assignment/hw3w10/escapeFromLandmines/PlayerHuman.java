@@ -1,19 +1,22 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one;
+package escapeFromLandmines;
 
-import static one.Resource.*;
+import static escapeFromLandmines.Resource.*;
 
 public class PlayerHuman extends Player {
+    // Variables
     private final int id;
-    private static int totalId = 0;
-    public PlayerHuman() {
+
+    // Constructor
+    public PlayerHuman(int id) {
         setPlayerType(TYPE.HUMAN);
-        id = totalId;
-        totalId++;
+        this.id = id;
     }
 
+    // Methods
+    @Override
     public Dimension choose(Dimension range) {
         stdout.println("Input row", true);
         int row = stdin.nextInt();
@@ -27,5 +30,4 @@ public class PlayerHuman extends Player {
     public int getId() {
         return id;
     }
-
 }

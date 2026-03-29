@@ -1,17 +1,21 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one;
+package escapeFromLandmines;
+
+import static escapeFromLandmines.Resource.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import static one.Resource.*;
 
 public class Board {
     // Variable
     private final ArrayList<ArrayList<OBJECTS>> board;
     private final char[][] playerBoard;
+    // Use ArrayList for const board (Prefer hander to edit the value of its)
+    // And char array for easiler to edit
+
     private final Dimension dimension;
     private final int amountOfLandmines;
     private int openedLandmines;
@@ -77,6 +81,7 @@ public class Board {
         return playerBoard[dimension.row()][dimension.col()] != 'X';
     }
 
+    // Copy each char in board to playerBoard
     public void revealAll() {
         for (int row = 0; row < dimension.row(); row++) {
             for (int col = 0; col < dimension.col(); col++) {
@@ -85,6 +90,7 @@ public class Board {
         }
     }
 
+    // For Check when all landmines are revealed
     public boolean isOutOfLandmine() {
         return amountOfLandmines == openedLandmines;
     }

@@ -1,0 +1,29 @@
+%% Wirakorn Thanabat
+%% 6809617415
+
+flowchart TD
+    subgraph main
+        B([Start]) -->|request for mapsize and landmine amount| I[[Init]]
+        I -->|play game|T[[Turn]]
+        T -->|end when the player die| E([End])
+    end
+
+    subgraph Init
+        IA@{ shape: sm-circ, label : Start} --- IJ@{ shape : f-circ, label : "Junction" }
+        IJ --> ICB[Create Board]
+        IJ --> ICP[Create Player]
+        ICB --- IM@{shape: flip-tri, label : " "}
+        ICP --- IM
+        IM --> IZ@{shape: framed-circle, label : Stop}
+    end
+
+    subgraph Turn
+        TA@{ shape: sm-circ, label : Start} --> TQ[/Ask for Position to Open/]
+        TQ -->|Open Grid|ISBOM{Is Bomb?}
+        ISBOM -->|No| TQ
+        ISBOM -->|Yes| RD[Reduce Player's Health Point]
+        RD --> ISDOWN{Is Player's Health Point is 0?}
+        ISDOWN -->|No| TQ
+        ISDOWN --> |Yes| TZ@{shape: framed-circle, label: Stop} 
+
+    end

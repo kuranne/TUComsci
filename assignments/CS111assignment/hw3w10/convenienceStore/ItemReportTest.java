@@ -1,7 +1,7 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package two;
+package convenienceStore;
 
 import java.io.BufferedOutputStream;
 import java.io.PrintWriter;

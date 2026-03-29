@@ -1,7 +1,7 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package three;
+package bookStore;
 
 import java.util.Scanner;
 

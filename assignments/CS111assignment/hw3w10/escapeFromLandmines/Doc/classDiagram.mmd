@@ -2,6 +2,7 @@
 %% 6809617415
 
 classDiagram
+    %% === Resource === %%
     class Resource {
         +MINIMAL_MODE : boolean$
         +MINIMUM_LANDMINE : int$
@@ -35,48 +36,53 @@ classDiagram
         +row : int
         +col : int
     }
+    
+    %% --- Exceptions --- %%
+    class RuntimeException {
+        <<Built-in>>
+    }
+    class InvalidBoardInitializeException {
+        <<exception>>
+    }
+    InvalidBoardInitializeException --|> RuntimeException : extends
+
+    class InvalidGamePlayException {
+        <<exception>>
+    }
+    InvalidGamePlayException --|> RuntimeException : extends
+
+    Resource --> FastReader : instantiates
+    Resource --> Printer : instantiates
     Resource ..> Dimension : nested
     Resource ..> TYPE : nested
     Resource ..> OBJECTS : nested
-    Resource --> FastReader : instantiates
-    Resource --> Printer : instantiates
+    Resource ..> InvalidBoardInitializeException : nested
+    Resource ..> InvalidGamePlayException : nested
 
     class FastReader {
-        -BUF_SIZE : int
-        -din : DataInputStream
-        -buf : byte[]
-        -bufPointer : int
-        -bytesRead : int 
         FastReader(InputStream din)
         +nextInt() int 
-        -read() byte
-        -fillBuf() void
     }
+
     class Printer {
-        -out : PrintWriter
-        -BOLD : String
-        -RESET : String
         Printer(OutputStream out)
         +println(String txt, boolean flush) void
-        +printBoard(char[][] board) void
         +turnOf(String type) void
-        +openingGrid(Dimension dimension) void
         +showHealthPointOf(String type, int amount) void
-        +endGame(char[][] board) void
         +flush() void
         +bold(String txt) String
     }
+
     class Selectable {
         <<interface>>
         +choose() Dimension
     }
+
     class Player {
         <<abstract>>
         -healthPoint : int
         -alive : boolean
         -playerType : TYPE
-        -deathCount : int$
-        Player(TYPE playerType)
         +isAlive() boolean
         +getId()* int
         +reduceHealthPointBy(int damage) void
@@ -84,17 +90,19 @@ classDiagram
     }
     Player ..> Resource : static import
     Player ..|> Selectable : implements
+
     class PlayerHuman {
         -id : int
-        -totalId : int$
         +choose(Dimension range) Dimension
     }
     PlayerHuman --|> Player : extends
+
     class PlayerComputer {
         -openedPositions : HashSet<Dimension>$
         +choose(Dimension range) Dimension
     }
     PlayerComputer --|> Player : extends
+
     class Board {
         -board : List~List~OBJECTS~~
         -playerBoard : char[][]
@@ -103,36 +111,28 @@ classDiagram
         -openedLandmines : int
         Board(Dimension dimension, int amountOfLandmines)
         +setupBoard() void
-        +choose(Dimension dimension) boolean$ ArrayIndexOutOfBoundsException
+        +choose(Dimension dimension) boolean$
         +isReveal(Dimension dimension) boolean
         +isOutOfLandmines() boolean
         +revealAll() void
 
     }
     Board ..> Resource : static import
-    class RuntimeException {
-        <<Built-in>>
-    }
-    class InvalidBoardInitializeException {
-        <<exception>>
-        +InvalidBoardInitializeException(String message)
-    }
-    InvalidBoardInitializeException --|> RuntimeException
+
     class Operator {
-        -ArrayList~Player~ players
-        -Board world
-        -Dimension boardSize
-        +Operator()
+        -players : ArrayList~Player~ 
+        -world : Board
+        -boardSize : Dimension
         +setupGame() void
         +run() void
+        +endGame() void
+        -selectSetting() void
         -playersRound() void
         -processSinglePlayerTurn(Player p) void
-        +endGame() void
     }
     Operator --o Player : manages
     Operator --* Board : owns
     Operator ..> Resource : static import
-    Operator ..> InvalidBoardInitializeException : throws
 
     class TestGame {
         +main(String[] args)$ void

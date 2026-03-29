@@ -1,7 +1,7 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package two;
+package convenienceStore;
 
 public class ShoppingItem {
     // Variables

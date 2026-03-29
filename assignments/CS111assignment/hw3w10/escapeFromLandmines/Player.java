@@ -1,16 +1,15 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one;
+package escapeFromLandmines;
 
-import static one.Resource.*;
+import static escapeFromLandmines.Resource.*;
 
 public abstract class Player implements Selectable {
     // Variable
     private int healthPoint;
     private boolean alive;
     private TYPE playerType;
-    private static int deathCount = 0;
 
     // Constructor
     public Player() {
@@ -21,7 +20,22 @@ public abstract class Player implements Selectable {
         this();
         this.playerType = playerType;
     }
-
+    
+    // Methods
+    public void reduceHealthPointBy(int damage) {
+        if (alive) {
+            healthPoint -= damage;
+            if (healthPoint < 0) {
+                healthPoint = 0;
+            }
+            updateAlive();
+        }
+    }
+    public void updateAlive() {
+        alive = healthPoint > 0;
+    }
+    public abstract Dimension choose(Dimension range);
+    
     // Getter Methods
     public int getHealthPoint() {
         return healthPoint;
@@ -35,35 +49,13 @@ public abstract class Player implements Selectable {
     public String getPlayerTypeString() {
         return playerType.getType();
     }
-    public static int getDeathCount() {
-        return deathCount;
-    }
     public abstract int getId();
 
-    // Setter & Changer Methods
-    public void reduceHealthPointBy(int damage) {
-        if (alive) {
-            healthPoint -= damage;
-            if (healthPoint < 0) {
-                healthPoint = 0;
-            }
-            updateAlive();
-        }
-    }
-    
-    public void updateAlive() {
-        alive = healthPoint > 0;
-        if (!alive) deathCount++;
-    }
-
+    // Setter
     public void setPlayerType(TYPE playerType) {
         this.playerType = playerType;
     }
-
     public void setHealthPoint(int healthPoint) {
         this.healthPoint = healthPoint;
     }
-    
-    // Other Methods
-    public abstract Dimension choose(Dimension range);
 }

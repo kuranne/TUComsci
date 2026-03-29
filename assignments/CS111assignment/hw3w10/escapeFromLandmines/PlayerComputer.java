@@ -1,17 +1,23 @@
 // Wirakorn Thanabat
 // 6809617415
 
-package one;
+package escapeFromLandmines;
+
+import static escapeFromLandmines.Resource.*;
 
 import java.util.HashSet;
-import static one.Resource.*;
 
 public class PlayerComputer extends Player {
+    // Variables
     private static final HashSet<Dimension> openedPositions = new HashSet<>();
+
+    // Constructor
     public PlayerComputer() {
         setPlayerType(TYPE.COMPUTER);
     }
 
+    // Methods
+    @Override
     public Dimension choose(Dimension range) {
         Dimension nextRandom;
         do {
@@ -22,6 +28,7 @@ public class PlayerComputer extends Player {
         return nextRandom;
     }
 
+    // Getter Methods
     @Override
     public int getId() {
         return -1;
