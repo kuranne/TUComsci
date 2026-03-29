@@ -18,7 +18,7 @@ flowchart TD
     end
 
     subgraph Turn
-        TA@{ shape: sm-circ, label : Start} --> TQ[/Ask for Position to Open/]
+        TA@{ shape: sm-circ, label : Start} --> TQ[/Ask for Vector2 to Open/]
         TQ -->|Open Grid|ISBOM{Is Bomb?}
         ISBOM -->|No| TQ
         ISBOM -->|Yes| RD[Reduce Player's Health Point]

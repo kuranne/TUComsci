@@ -3,24 +3,25 @@
 
 package escapeFromLandmines;
 
-import static escapeFromLandmines.Resource.*;
+import static escapeFromLandmines.Constants.*;
+import escapeFromLandmines.Model.Vector2;
+import escapeFromLandmines.Model.PlayerType;
+import escapeFromLandmines.GameException.*;
 
 import java.util.ArrayList;
 
-import escapeFromLandmines.Resource.Dimension;
-import escapeFromLandmines.Resource.InvalidBoardInitializeException;
-import escapeFromLandmines.Resource.InvalidGamePlayException;
-import escapeFromLandmines.Resource.TYPE;
-
 public class Operator {
     // Variables
+    private static final Printer stdout = new Printer(System.out);
+    private static final FastReader stdin = new FastReader(System.in);
+
     private static final String SELECT_TEXT = """
             Select one of
             1. Start the game with default setting
             2. Set players and Board size before start""";
     private ArrayList<Player> players;
     private Board world;
-    private Dimension boardSize;
+    private Vector2 boardScope;
 
     // Constructor
     public Operator() {
@@ -28,19 +29,20 @@ public class Operator {
     }
 
     // Setup game
-    // Set Player(non-minimal_mode), board's dimension size and amount of landmines
+    // Set Player(non-minimal_mode), board's size and amount of landmines
     public void setupGame() {
         boolean boardInited = false;
         do {
             players.clear();
+            PlayerComputer.resetMemory();
             try {
                 if (!MINIMAL_MODE) {
                     stdout.println(SELECT_TEXT, true);
-                    selectSetting();
+                    selectSettingMethod();
                     stdout.println(String.format(
-                            "boardSize is %dx%d",
-                            boardSize.row(),
-                            boardSize.col()),
+                            "boardScope is %dx%d",
+                            boardScope.row(),
+                            boardScope.col()),
                             false);
                     stdout.println(String.format(
                             "Landmine amounts are set to %d",
@@ -64,7 +66,6 @@ public class Operator {
         } while (!boardInited);
     }
 
-    // Main Methods
     public void run() {
         setupGame();
         // Loop until not in Condition
@@ -94,11 +95,11 @@ public class Operator {
         while (!validMove) {
             try {
                 String turnLabel = getTurnLabel(player);
-                if (MINIMAL_MODE && turnLabel.equals(TYPE.HUMAN.getType()))
+                if (MINIMAL_MODE && turnLabel.equals(PlayerType.HUMAN.getType()))
                     turnLabel = "Player";
                 stdout.turnOf(turnLabel);
 
-                Dimension playerChoice = player.choose(boardSize);
+                Vector2 playerChoice = player.choose((player.getPlayerType() == PlayerType.COMPUTER)? boardScope: inputCoordinate());
 
                 isValidCoordinate(playerChoice);
 
@@ -130,6 +131,10 @@ public class Operator {
                     stdout.println(stdout.bold(e.getMessage()), true);
                     continue;
                 }
+                if (e instanceof ArrayIndexOutOfBoundsException) {
+                    stdout.println(stdout.bold("Something wrong..."), true);
+                    continue;
+                }
                 throw e;
             }
         }
@@ -138,7 +143,7 @@ public class Operator {
         world.revealAll();
         stdout.endGame(world.getPlayerBoard());
     }
-    private void selectSetting() {
+    private void selectSettingMethod() {
         boolean pass = false;
         do {
             switch (stdin.nextInt()) {
@@ -162,28 +167,44 @@ public class Operator {
         return Math.max(landmines, MINIMUM_LANDMINE);
     }
     private long countHumanPlayers() {
-        return players.stream().filter(p -> p.getPlayerType() == TYPE.HUMAN).count();
+        return players.stream().filter(p -> p.getPlayerType() == PlayerType.HUMAN).count();
     }
     private boolean runCondition() {
         return (getPlayerDeathCount() < players.size() - (players.size() > 1 ? 1 : 0)
                 && (MINIMAL_MODE || !world.isOutOfLandmine()));
     }
+    private Vector2 inputCoordinate() {
+        stdout.println("Input row", true);
+        int row = stdin.nextInt();
+        stdout.println("Input col", true);
+        int col = stdin.nextInt();
+        return new Vector2(row, col);
+    }
+    private int inputCustomLandmineAmount() {
+        stdout.println(
+                String.format(
+                        "Input for landmine amounts %s",
+                        (MINIMAL_MODE) ? "(not less than 5)" : ""),
+                true);
+        return stdin.nextInt();
+    }
 
     // Special Methods
     private void setBoardAndPlayer() {
         setDefaultPlayer();
-        world = new Board(boardSize = getCustomBoardSize(), allowanceLandmines(getCustomLandmineAmount()));
+        stdout.println(stdout.bold("Input for row and column of Board"), true);
+        world = new Board(boardScope = inputCoordinate(), allowanceLandmines(inputCustomLandmineAmount()));
     }
 
     // Default setting
     private void setDefaultPlayer() {
-        setPlayer(TYPE.HUMAN, HUMAN_PLAYER_AMOUNT);
-        setPlayer(TYPE.COMPUTER, COMPUTER_PLAYER_AMOUNT);
+        setPlayer(PlayerType.HUMAN, HUMAN_PLAYER_AMOUNT);
+        setPlayer(PlayerType.COMPUTER, COMPUTER_PLAYER_AMOUNT);
     }
 
     private void setDefaultBoard() {
-        boardSize = BOARD_SIZE;
-        world = new Board(boardSize, boardSize.area() / 5);
+        boardScope = BOARD_SIZE;
+        world = new Board(boardScope, boardScope.area() / 5);
     }
 
     private void defaultSetting() {
@@ -195,9 +216,9 @@ public class Operator {
     private void setCustomPlayer() {
         try {
             stdout.println("Input for Number of Human Players", true);
-            setPlayer(TYPE.HUMAN, stdin.nextInt());
+            setPlayer(PlayerType.HUMAN, stdin.nextInt());
             stdout.println("Input for Number of Computer Players", true);
-            setPlayer(TYPE.COMPUTER, stdin.nextInt());
+            setPlayer(PlayerType.COMPUTER, stdin.nextInt());
             stdout.println("Input for Health of Players", true);
             int Health = stdin.nextInt();
             for (Player player : players) {
@@ -210,20 +231,19 @@ public class Operator {
     }
 
     private void setCustomBoard() {
-        world = new Board(boardSize = getCustomBoardSize(), getCustomLandmineAmount());
+        stdout.println(stdout.bold("Input for row and column of Board"), true);
+        world = new Board(boardScope = inputCoordinate(), inputCustomLandmineAmount());
     }
 
     private void customSetting() {
-        // Requesting for Player
         setCustomPlayer();
-        // Requesting for Board
         setCustomBoard();
     }
 
     // Validate
     // isValidCoordinate check for player' choose grid that
     // Row & Col must be more than or equal to 0 and less that the board size
-    private boolean isValidCoordinate(Dimension choice) {
+    private boolean isValidCoordinate(Vector2 choice) {
         if (!(isValidRowNumber(choice.row()) || isValidColNumber(choice.col())))
             throw new InvalidGamePlayException("Invalid row and column. Choose again");
         if (!isValidRowNumber(choice.row()))
@@ -234,40 +254,23 @@ public class Operator {
     }
 
     private boolean isValidBoardCreated() throws InvalidBoardInitializeException {
-        if (boardSize.area() < world.getAmountOfLandmines()) {
+        if (boardScope.area() < world.getAmountOfLandmines()) {
             throw new InvalidBoardInitializeException("Board's grids area must exceed landmines");
         }
         return true;
     }
 
     private boolean isValidRowNumber(int row) {
-        return row >= 0 && row < boardSize.row();
+        return row >= 0 && row < boardScope.row();
     }
 
     private boolean isValidColNumber(int col) {
-        return col >= 0 && col < boardSize.col();
+        return col >= 0 && col < boardScope.col();
     }
 
     // Getter Methods
-    private Dimension getCustomBoardSize() {
-        stdout.println("Input for row of Board", true);
-        int row = stdin.nextInt();
-        stdout.println("Input for colum of Board", true);
-        int col = stdin.nextInt();
-        return new Dimension(row, col);
-    }
-
-    private int getCustomLandmineAmount() {
-        stdout.println(
-                String.format(
-                        "Input for landmine amounts %s",
-                        (MINIMAL_MODE) ? "(not less than 5)" : ""),
-                true);
-        return stdin.nextInt();
-    }
-
     private String getTurnLabel(Player player) {
-        boolean isComputer = player.getPlayerType() == TYPE.COMPUTER;
+        boolean isComputer = player.getPlayerType() == PlayerType.COMPUTER;
         boolean isOnlyOneHuman = countHumanPlayers() == 1;
         return (isComputer || isOnlyOneHuman)
                 ? player.getPlayerTypeString()
@@ -279,12 +282,12 @@ public class Operator {
     }
 
     // Setter Methods
-    private void setPlayer(TYPE type, int amount) {
+    private void setPlayer(PlayerType type, int amount) {
         for (int i = 0; i < amount; i++) {
             players.add(
-                    ((type == TYPE.HUMAN)
-                            ? new PlayerHuman(i)
-                            : new PlayerComputer()));
+                    ((type == PlayerType.HUMAN)
+                            ? new PlayerHuman(INITIAL_HEALTH_POINT, i)
+                            : new PlayerComputer(INITIAL_HEALTH_POINT)));
         }
     }
 }

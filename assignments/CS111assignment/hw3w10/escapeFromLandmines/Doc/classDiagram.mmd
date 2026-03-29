@@ -1,140 +1,177 @@
+---
+config:
+    layout: elk
+---
+
 %% Wirakorn Thanabat
 %% 6809617415
 
 classDiagram
-    %% === Resource === %%
-    class Resource {
-        +MINIMAL_MODE : boolean$
-        +MINIMUM_LANDMINE : int$
-        +INITIAL_HEALT_POINT : int$
-        +HUMAN_PLAYER_AMOUNT : int$
-        +COMPUTER_PLAYER_AMOUNT : int$
-        +BLAST_DAMAGE : int $
-        +BOARD_SIZE : Dimension$
-        +rand : Random$
-        +stdin : FastReader$
-        +stdout : Printer$
+    %% === Built-in === %%
+    class RuntimeException {
+        <<built-in>>
     }
-    class OBJECTS {
+    %% --- Built-in --- %%
+
+    %% === Model === %%
+    class Model { <<container>> }
+    class BoardObj {
         <<enumeration>>
         NONE
         LANDMINE
-        -description : String
+        OTHER
         +isSafe() boolean
-        +getChar() char
     }
-    class TYPE {
+    class PlayerType {
         <<enumeration>>
         HUMAN
         COMPUTER
         OTHER
-        -description : String
-        +getType() String 
+        +getType() String
     }
-    class Dimension {
+    class Vector2 {
         <<record>>
-        +row : int
-        +col : int
+        +row : int 
+        +col : int 
+        +area() int 
     }
-    
-    %% --- Exceptions --- %%
-    class RuntimeException {
-        <<Built-in>>
+    %% --- Model --- %%
+
+    %% === Constants === %%
+    class Constants {
+        +MINIMAL_MODE : boolean$
+        +MINIMUM_LANDMINE : int$
+        +INITIAL_HEALTH_POINT : int$
+        +HUMAN_PLAYER_AMOUNT : int$
+        +COMPUTER_PLAYER_AMOUNT : int$
+        +BLAST_DAMAGE : int$
+        +BOARD_SIZE : Vector2$
+    }
+    %% --- Constants --- %%
+
+    %% === Board === %%
+    class Board {
+        -rand : Random$
+        -board : ArrayList~ArrayList~BoardObj~~
+        -playerBoard : char[][]
+        -scope : Vector2
+        -amountOfLandmines : int
+        -usedLandmines : int
+        Board(Vector2 scope, int amountOfLandmines)
+        +setupBoard() void
+        +choose(Vector2 coordinate) boolean
+        +isReveal(Vector2 coordinate) boolean
+        +revealAll() void
+        +isOutOfLandmines() : boolean
+    }
+    %% --- Board --- %%
+
+    %% === GameException === %%
+    class GameException {
+        <<container>>
     }
     class InvalidBoardInitializeException {
         <<exception>>
+        InvalidBoardInitializeException(String message)
     }
-    InvalidBoardInitializeException --|> RuntimeException : extends
-
     class InvalidGamePlayException {
         <<exception>>
+        InvalidGamePlayException(String message)
     }
-    InvalidGamePlayException --|> RuntimeException : extends
+    %% --- GameException --- %%
 
-    Resource --> FastReader : instantiates
-    Resource --> Printer : instantiates
-    Resource ..> Dimension : nested
-    Resource ..> TYPE : nested
-    Resource ..> OBJECTS : nested
-    Resource ..> InvalidBoardInitializeException : nested
-    Resource ..> InvalidGamePlayException : nested
-
-    class FastReader {
-        FastReader(InputStream din)
-        +nextInt() int 
+    %% === Player === %%
+    class Selectable {
+        <<interface>>
+        choose() Vector2
     }
+    class Player {
+        -healthPoint : int 
+        -alive : boolean
+        -playerType : PlayerType
+        Player(int healthPoint)
+        +reduceHealthPointBy(int damage) void
+        +choose(Vector2 coordinate)* Vector2
+    }
+    class PlayerComputer {
+        -rand : Random$
+        -openedCoordinate : HashSet~Vector2~$
+        PlayerComputer(int healthPoint)
+    }
+    class PlayerHuman {
+        -id : int 
+        +getId() int 
+        PlayerHuman(int healthPoint, int id)
+    }
+    %% --- Player --- %%
 
+    %% === IO === %%
     class Printer {
         Printer(OutputStream out)
         +println(String txt, boolean flush) void
-        +turnOf(String type) void
-        +showHealthPointOf(String type, int amount) void
+        +bold(String txt) void
         +flush() void
-        +bold(String txt) String
     }
 
-    class Selectable {
-        <<interface>>
-        +choose() Dimension
+    class FastReader {
+        FastReader(InputStream in)
+        +nextInt() int
     }
+    %% --- IO --- %%
 
-    class Player {
-        <<abstract>>
-        -healthPoint : int
-        -alive : boolean
-        -playerType : TYPE
-        +isAlive() boolean
-        +getId()* int
-        +reduceHealthPointBy(int damage) void
-        +choose(Dimension range)* Dimension
-    }
-    Player ..> Resource : static import
-    Player ..|> Selectable : implements
-
-    class PlayerHuman {
-        -id : int
-        +choose(Dimension range) Dimension
-    }
-    PlayerHuman --|> Player : extends
-
-    class PlayerComputer {
-        -openedPositions : HashSet<Dimension>$
-        +choose(Dimension range) Dimension
-    }
-    PlayerComputer --|> Player : extends
-
-    class Board {
-        -board : List~List~OBJECTS~~
-        -playerBoard : char[][]
-        -dimension : Dimension
-        -amountOfLandmines : int
-        -openedLandmines : int
-        Board(Dimension dimension, int amountOfLandmines)
-        +setupBoard() void
-        +choose(Dimension dimension) boolean$
-        +isReveal(Dimension dimension) boolean
-        +isOutOfLandmines() boolean
-        +revealAll() void
-
-    }
-    Board ..> Resource : static import
-
+    %% === Operator === %
     class Operator {
-        -players : ArrayList~Player~ 
+        -players : ArrayList~Player~
         -world : Board
-        -boardSize : Dimension
-        +setupGame() void
+        -boardScope : Vector2
         +run() void
+        +setupGame() void
         +endGame() void
-        -selectSetting() void
-        -playersRound() void
-        -processSinglePlayerTurn(Player p) void
+        -playerRound() void
+        -processSinglePlayerTurn(Player player) void
+        -inputCoordinate() Vector2
     }
-    Operator --o Player : manages
-    Operator --* Board : owns
-    Operator ..> Resource : static import
+    %% --- Operator --- %
 
+    %% === TestGame === %%
     class TestGame {
         +main(String[] args)$ void
     }
-    TestGame --> Operator : instantiates
+    %% --- TestGame --- %%
+
+    
+
+    %% ========================================== %%
+    %%               RELATIONSHIPS                %%
+    %% ========================================== %%
+
+    TestGame --> Operator
+    Operator "one" --> "one" Board : control
+    Operator "one" --o "many" Player : manages
+
+    Operator --> FastReader
+    Operator --> Printer
+    Operator ..> Constants : uses
+
+    PlayerComputer --|> Player
+    PlayerHuman --|> Player
+    Player ..|> Selectable : implements
+
+    Model --* BoardObj
+    Model --* PlayerType
+    Model --* Vector2
+
+    Board --> BoardObj
+    Operator ..> PlayerType
+    Player --> PlayerType
+    Operator --> Vector2
+    Constants --> Vector2
+    Board --> Vector2
+    Player ..> Vector2 : uses
+
+    GameException --* InvalidBoardInitializeException
+    GameException --* InvalidGamePlayException
+    InvalidBoardInitializeException --|> RuntimeException
+    InvalidGamePlayException --|> RuntimeException
+    Operator ..> InvalidBoardInitializeException : throws
+    Operator ..> InvalidGamePlayException : throws

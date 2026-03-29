@@ -3,8 +3,8 @@
 
 package escapeFromLandmines;
 
-import escapeFromLandmines.Resource.Dimension;
+import escapeFromLandmines.Model.Vector2;
 
 public interface Selectable {
-    Dimension choose(Dimension range);
+    Vector2 choose(Vector2 coordinate);
 }

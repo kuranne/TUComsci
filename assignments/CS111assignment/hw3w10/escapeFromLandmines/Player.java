@@ -3,22 +3,19 @@
 
 package escapeFromLandmines;
 
-import static escapeFromLandmines.Resource.*;
+import escapeFromLandmines.Model.PlayerType;
+import escapeFromLandmines.Model.Vector2;
 
 public abstract class Player implements Selectable {
     // Variable
     private int healthPoint;
     private boolean alive;
-    private TYPE playerType;
+    private PlayerType playerType;
 
     // Constructor
-    public Player() {
-        healthPoint = INITIAL_HEALT_POINT;
+    public Player(int healthPoint) {
+        this.healthPoint = healthPoint;
         alive = healthPoint > 0;
-    }
-    public Player(TYPE playerType) {
-        this();
-        this.playerType = playerType;
     }
     
     // Methods
@@ -34,7 +31,7 @@ public abstract class Player implements Selectable {
     public void updateAlive() {
         alive = healthPoint > 0;
     }
-    public abstract Dimension choose(Dimension range);
+    public abstract Vector2 choose(Vector2 scope);
     
     // Getter Methods
     public int getHealthPoint() {
@@ -43,7 +40,7 @@ public abstract class Player implements Selectable {
     public boolean isAlive() {
         return alive;
     }
-    public TYPE getPlayerType() {
+    public PlayerType getPlayerType() {
         return playerType;
     }
     public String getPlayerTypeString() {
@@ -52,7 +49,7 @@ public abstract class Player implements Selectable {
     public abstract int getId();
 
     // Setter
-    public void setPlayerType(TYPE playerType) {
+    public void setPlayerType(PlayerType playerType) {
         this.playerType = playerType;
     }
     public void setHealthPoint(int healthPoint) {

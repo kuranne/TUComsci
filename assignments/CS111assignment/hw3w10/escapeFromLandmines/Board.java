@@ -3,38 +3,41 @@
 
 package escapeFromLandmines;
 
-import static escapeFromLandmines.Resource.*;
+import escapeFromLandmines.Model.BoardObj;
+import escapeFromLandmines.Model.Vector2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 
 public class Board {
     // Variable
-    private final ArrayList<ArrayList<OBJECTS>> board;
+    private static final Random rand = new Random();
+
+    private final ArrayList<ArrayList<BoardObj>> board;
     private final char[][] playerBoard;
     // Use ArrayList for const board (Prefer hander to edit the value of its)
     // And char array for easiler to edit
-
-    private final Dimension dimension;
+    private final Vector2 scope;
     private final int amountOfLandmines;
-    private int openedLandmines;
+    private int amountOfUsedLandmines;
 
     // Constructor
-    public Board(Dimension dimension, int amountOfLandmines) {
-        this.dimension = dimension;
+    public Board(Vector2 scope, int amountOfLandmines) {
+        this.scope = scope;
         this.amountOfLandmines = amountOfLandmines;
-        this.openedLandmines = 0;
+        this.amountOfUsedLandmines = 0;
 
         board = new ArrayList<>();
-        playerBoard = new char[dimension.row()][dimension.col()];
+        playerBoard = new char[scope.row()][scope.col()];
     }
     public void setupBoard() {
         // Initialize board with '-'
-        for (int i = 0; i < dimension.row(); i++) {
-            ArrayList<OBJECTS> row = new ArrayList<>();
-            for (int j = 0; j < dimension.col(); j++) {
-                row.add(OBJECTS.NONE);
+        for (int i = 0; i < scope.row(); i++) {
+            ArrayList<BoardObj> row = new ArrayList<>();
+            for (int j = 0; j < scope.col(); j++) {
+                row.add(BoardObj.NONE);
             }
             board.add(row);
         }
@@ -45,15 +48,15 @@ public class Board {
         }
         
         // Place landmines randomly
-        HashSet<Dimension> placedLandmines = new HashSet<>();
+        HashSet<Vector2> placedLandmines = new HashSet<>();
         while (placedLandmines.size() < amountOfLandmines) {
-            Dimension randomPos = new Dimension(
-                rand.nextInt(dimension.row()), 
-                rand.nextInt(dimension.col())
+            Vector2 randomPos = new Vector2(
+                rand.nextInt(scope.row()), 
+                rand.nextInt(scope.col())
             );
             
             if (!placedLandmines.contains(randomPos)) {
-                board.get(randomPos.row()).set(randomPos.col(), OBJECTS.LANDMINE);
+                board.get(randomPos.row()).set(randomPos.col(), BoardObj.LANDMINE);
                 placedLandmines.add(randomPos);
             }
         }
@@ -62,29 +65,29 @@ public class Board {
     // Methods
     // A player choose a position -> if revealed as landmine -> B0OM!
     // Ret: true if not boom, else is BO0M!
-    public boolean choose(Dimension dimension) throws ArrayIndexOutOfBoundsException {
-        int row = dimension.row();
-        int col = dimension.col();
+    public boolean choose(Vector2 coordinate) throws ArrayIndexOutOfBoundsException {
+        int row = coordinate.row();
+        int col = coordinate.col();
         char area = playerBoard[row][col];
 
         if (area == 'X') { // If area is hidden -> make it appeal
-            OBJECTS what = board.get(row).get(col);
+            BoardObj what = board.get(row).get(col);
             playerBoard[row][col] = what.getChar();
-            if (what == OBJECTS.LANDMINE) openedLandmines++;
+            if (what == BoardObj.LANDMINE) amountOfUsedLandmines++;
             return what.isSafe();
         } else {
             return true;
         }
     }
 
-    public boolean isReveal(Dimension dimension) {
-        return playerBoard[dimension.row()][dimension.col()] != 'X';
+    public boolean isReveal(Vector2 coordinate) {
+        return playerBoard[coordinate.row()][coordinate.col()] != 'X';
     }
 
     // Copy each char in board to playerBoard
     public void revealAll() {
-        for (int row = 0; row < dimension.row(); row++) {
-            for (int col = 0; col < dimension.col(); col++) {
+        for (int row = 0; row < scope.row(); row++) {
+            for (int col = 0; col < scope.col(); col++) {
                 playerBoard[row][col] = (board.get(row).get(col).isSafe()) ? '-' : 'b';
             }
         }
@@ -92,7 +95,7 @@ public class Board {
 
     // For Check when all landmines are revealed
     public boolean isOutOfLandmine() {
-        return amountOfLandmines == openedLandmines;
+        return amountOfLandmines == amountOfUsedLandmines;
     }
 
     // Getter Methods
@@ -102,8 +105,8 @@ public class Board {
     public int getAmountOfLandmines() {
         return amountOfLandmines;
     }
-    public int getOpenedLandmines() {
-        return openedLandmines;
+    public int getAmountOfUsedLandmines() {
+        return amountOfUsedLandmines;
     }
     
 }

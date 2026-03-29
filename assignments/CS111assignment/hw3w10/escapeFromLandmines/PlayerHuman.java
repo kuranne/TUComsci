@@ -3,26 +3,24 @@
 
 package escapeFromLandmines;
 
-import static escapeFromLandmines.Resource.*;
+import escapeFromLandmines.Model.PlayerType;
+import escapeFromLandmines.Model.Vector2;
 
 public class PlayerHuman extends Player {
-    // Variables
+    // Variables    
     private final int id;
 
     // Constructor
-    public PlayerHuman(int id) {
-        setPlayerType(TYPE.HUMAN);
+    public PlayerHuman(int healthPoint, int id) {
+        super(healthPoint);
+        setPlayerType(PlayerType.HUMAN);
         this.id = id;
     }
 
     // Methods
     @Override
-    public Dimension choose(Dimension range) {
-        stdout.println("Input row", true);
-        int row = stdin.nextInt();
-        stdout.println("Input col", true);
-        int col = stdin.nextInt();
-        return new Dimension(row, col);
+    public Vector2 choose(Vector2 scope) {
+        return scope;
     }
 
     // Getter Methods
